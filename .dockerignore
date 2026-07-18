@@ -1,0 +1,7 @@
+node_modules
+.git
+.agents
+scratch*
+test_gemini.js
+.dockerignore
+Dockerfile

@@ -315,6 +315,22 @@ window.addEventListener('load', () => {
   checkAPIConnectivity();
   renderScenario();
   renderAuditLogs();
+
+  // Setup API Key configuration input
+  const keyInput = document.getElementById("apiConfigKey");
+  if (keyInput) {
+    keyInput.value = DIRECT_GEMINI_KEY;
+    keyInput.addEventListener("input", (e) => {
+      const val = e.target.value.trim();
+      if (val) {
+        localStorage.setItem("venueiq_api_key", val);
+        DIRECT_GEMINI_KEY = val;
+      } else {
+        localStorage.removeItem("venueiq_api_key");
+        DIRECT_GEMINI_KEY = "";
+      }
+    });
+  }
 });
 
 // Check Server Connectivity and Key
@@ -348,8 +364,11 @@ async function checkAPIConnectivity() {
   }
 }
 
-// Call backend API, fallback to local rule model
+let DIRECT_GEMINI_KEY = localStorage.getItem("venueiq_api_key") || "";
+
+// Call backend API or make direct client-side fetch, fallback to local rules
 async function generateResponse(prompt, systemInstruction = '') {
+  // 1. Try backend API proxy first (if server is active)
   if (apiActive) {
     try {
       const response = await fetch('/api/generate', {
@@ -360,12 +379,53 @@ async function generateResponse(prompt, systemInstruction = '') {
       if (response.ok) {
         const data = await response.json();
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text) return { text, source: "Gemini 2.0" };
+        if (text) return { text, source: "Gemini (Server Proxy)" };
       }
     } catch (e) {
-      console.warn("API call failed, running local generation fallback...", e);
+      console.warn("Server API proxy failed, trying direct browser-to-Gemini connection...", e);
     }
   }
+
+  // 2. Try direct client-side fetch to Google API using our free tier key
+  try {
+    const directUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${DIRECT_GEMINI_KEY}`;
+    
+    const geminiPayload = {
+      contents: [{
+        parts: [{ text: prompt }]
+      }],
+      generationConfig: {
+        temperature: 0.4,
+        maxOutputTokens: 1000
+      }
+    };
+
+    if (systemInstruction) {
+      geminiPayload.systemInstruction = {
+        parts: [{ text: systemInstruction }]
+      };
+    }
+
+    const response = await fetch(directUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(geminiPayload)
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) {
+        return { text, source: "Gemini (Direct Client)" };
+      }
+    } else {
+      console.warn(`Direct Gemini API failed with status ${response.status}`);
+    }
+  } catch (err) {
+    console.warn("Direct browser-to-Gemini call failed:", err);
+  }
+
+  // 3. Fallback to offline local rules engine
   return { text: generateLocalFallback(prompt, systemInstruction), source: "Model Fallback Engine" };
 }
 

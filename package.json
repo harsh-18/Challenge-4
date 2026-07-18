@@ -1,0 +1,10 @@
+{
+  "name": "venueiq-2026",
+  "version": "1.0.0",
+  "description": "VenueIQ 2026 World Cup ops copilot",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {}
+}

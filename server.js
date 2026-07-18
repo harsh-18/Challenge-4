@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080; // Default to 8080 for Cloud Run
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
 const MIME_TYPES = {
@@ -102,9 +102,10 @@ const server = http.createServer(async (req, res) => {
   // Serve Static Files
   let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
   
-  // Basic security check to prevent directory traversal
+  // Correct security check to prevent directory traversal
   const relative = path.relative(__dirname, filePath);
-  if (relative.startsWith('..') || path.isAbsolute(relative) === false) {
+  const isSafe = !relative.startsWith('..') && !path.isAbsolute(relative);
+  if (!isSafe) {
     res.writeHead(403, { 'Content-Type': 'text/plain' });
     res.end('Forbidden');
     return;
@@ -130,6 +131,6 @@ server.listen(PORT, () => {
   console.log(`==================================================`);
   console.log(`  VenueIQ 2026 local server running at:`);
   console.log(`  http://localhost:${PORT}`);
-  console.log(`  API key config: ${GOOGLE_API_KEY ? 'CONGREGATED' : 'NOT FOUND'}`);
+  console.log(`  API key config: ${GOOGLE_API_KEY ? 'ACTIVE' : 'NOT FOUND'}`);
   console.log(`==================================================`);
 });

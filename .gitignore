@@ -1,0 +1,6 @@
+Instructions.md
+node_modules/
+scratch/
+test_gemini.js
+.env
+.env.*
