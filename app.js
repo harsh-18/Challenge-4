@@ -253,32 +253,36 @@ const auditLogs = [
   }
 ];
 
-// DOM Elements
-const crowdMetric = document.getElementById("crowdMetric");
-const crowdProgress = document.getElementById("crowdProgress");
-const crowdDelta = document.getElementById("crowdDelta");
-const accessMetric = document.getElementById("accessMetric");
-const accessProgress = document.getElementById("accessProgress");
-const staffMetric = document.getElementById("staffMetric");
-const staffProgress = document.getElementById("staffProgress");
-const transitMetric = document.getElementById("transitMetric");
-const transitProgress = document.getElementById("transitProgress");
-const riskPill = document.getElementById("riskPill");
-const briefList = document.getElementById("briefList");
-const dispatchList = document.getElementById("dispatchList");
-const scenarioSelect = document.getElementById("scenarioSelect");
-const venueSelect = document.getElementById("venueSelect");
-const incidentSelect = document.getElementById("incidentSelect");
-const zoneDetail = document.getElementById("zoneDetail");
-const chatWindow = document.getElementById("chatWindow");
-const fanQuestion = document.getElementById("fanQuestion");
-const apiStatusText = document.getElementById("apiStatusText");
-const auditLogBody = document.getElementById("auditLogBody");
-const clearAuditBtn = document.getElementById("clearAuditBtn");
-const approveDispatchBtn = document.getElementById("approveDispatchBtn");
-const optimizeNudgeBtn = document.getElementById("optimizeNudgeBtn");
-const ecoActiveNudges = document.getElementById("ecoActiveNudges");
-const nudgeRecommendation = document.getElementById("nudgeRecommendation");
+// DOM Elements (declared globally, initialized only in browser context)
+let crowdMetric, crowdProgress, crowdDelta, accessMetric, accessProgress, staffMetric, staffProgress, transitMetric, transitProgress, riskPill, briefList, dispatchList, scenarioSelect, venueSelect, incidentSelect, zoneDetail, chatWindow, fanQuestion, apiStatusText, auditLogBody, clearAuditBtn, approveDispatchBtn, optimizeNudgeBtn, ecoActiveNudges, nudgeRecommendation;
+
+if (typeof document !== 'undefined') {
+  crowdMetric = document.getElementById("crowdMetric");
+  crowdProgress = document.getElementById("crowdProgress");
+  crowdDelta = document.getElementById("crowdDelta");
+  accessMetric = document.getElementById("accessMetric");
+  accessProgress = document.getElementById("accessProgress");
+  staffMetric = document.getElementById("staffMetric");
+  staffProgress = document.getElementById("staffProgress");
+  transitMetric = document.getElementById("transitMetric");
+  transitProgress = document.getElementById("transitProgress");
+  riskPill = document.getElementById("riskPill");
+  briefList = document.getElementById("briefList");
+  dispatchList = document.getElementById("dispatchList");
+  scenarioSelect = document.getElementById("scenarioSelect");
+  venueSelect = document.getElementById("venueSelect");
+  incidentSelect = document.getElementById("incidentSelect");
+  zoneDetail = document.getElementById("zoneDetail");
+  chatWindow = document.getElementById("chatWindow");
+  fanQuestion = document.getElementById("fanQuestion");
+  apiStatusText = document.getElementById("apiStatusText");
+  auditLogBody = document.getElementById("auditLogBody");
+  clearAuditBtn = document.getElementById("clearAuditBtn");
+  approveDispatchBtn = document.getElementById("approveDispatchBtn");
+  optimizeNudgeBtn = document.getElementById("optimizeNudgeBtn");
+  ecoActiveNudges = document.getElementById("ecoActiveNudges");
+  nudgeRecommendation = document.getElementById("nudgeRecommendation");
+}
 
 // Active States
 let currentScenario = 'pregame';
@@ -309,29 +313,31 @@ function handleTabRouting() {
   });
 }
 
-window.addEventListener('hashchange', handleTabRouting);
-window.addEventListener('load', () => {
-  handleTabRouting();
-  checkAPIConnectivity();
-  renderScenario();
-  renderAuditLogs();
+if (typeof window !== 'undefined') {
+  window.addEventListener('hashchange', handleTabRouting);
+  window.addEventListener('load', () => {
+    handleTabRouting();
+    checkAPIConnectivity();
+    renderScenario();
+    renderAuditLogs();
 
-  // Setup API Key configuration input
-  const keyInput = document.getElementById("apiConfigKey");
-  if (keyInput) {
-    keyInput.value = DIRECT_GEMINI_KEY;
-    keyInput.addEventListener("input", (e) => {
-      const val = e.target.value.trim();
-      if (val) {
-        localStorage.setItem("venueiq_api_key", val);
-        DIRECT_GEMINI_KEY = val;
-      } else {
-        localStorage.removeItem("venueiq_api_key");
-        DIRECT_GEMINI_KEY = "";
-      }
-    });
-  }
-});
+    // Setup API Key configuration input
+    const keyInput = document.getElementById("apiConfigKey");
+    if (keyInput) {
+      keyInput.value = DIRECT_GEMINI_KEY;
+      keyInput.addEventListener("input", (e) => {
+        const val = e.target.value.trim();
+        if (val) {
+          localStorage.setItem("venueiq_api_key", val);
+          DIRECT_GEMINI_KEY = val;
+        } else {
+          localStorage.removeItem("venueiq_api_key");
+          DIRECT_GEMINI_KEY = "";
+        }
+      });
+    }
+  });
+}
 
 // Check Server Connectivity and Key
 async function checkAPIConnectivity() {
@@ -364,7 +370,10 @@ async function checkAPIConnectivity() {
   }
 }
 
-let DIRECT_GEMINI_KEY = localStorage.getItem("venueiq_api_key") || "";
+let DIRECT_GEMINI_KEY = "";
+if (typeof localStorage !== 'undefined') {
+  DIRECT_GEMINI_KEY = localStorage.getItem("venueiq_api_key") || "";
+}
 
 // Call backend API or make direct client-side fetch, fallback to local rules
 async function generateResponse(prompt, systemInstruction = '') {
@@ -431,23 +440,24 @@ async function generateResponse(prompt, systemInstruction = '') {
 
 // Local Generative Fallback Model
 function generateLocalFallback(prompt, systemInstruction) {
-  const venue = venueProfiles[venueSelect.value];
+  const activeVenueKey = (typeof venueSelect !== 'undefined' && venueSelect) ? venueSelect.value : 'ny';
+  const venue = venueProfiles[activeVenueKey];
   const query = prompt.toLowerCase();
   
-  // Detect requested language
+  // Detect requested language (avoiding \b boundaries next to unicode characters)
   let lang = "en";
-  if (/\bspanish|español|castellano\b/i.test(query)) lang = "es";
-  else if (/\bfrench|français\b/i.test(query)) lang = "fr";
-  else if (/\bportuguese|português\b/i.test(query)) lang = "pt";
-  else if (/\barabic|عربي\b/i.test(query)) lang = "ar";
+  if (/\bspanish\b|español|\bcastellano\b|espanol/i.test(query)) lang = "es";
+  else if (/\bfrench\b|français|francais/i.test(query)) lang = "fr";
+  else if (/\bportuguese\b|português|portugues/i.test(query)) lang = "pt";
+  else if (/\barabic\b|عربي/i.test(query)) lang = "ar";
   else if (/\bgerman|deutsch\b/i.test(query)) lang = "de";
 
-  // Accessibility Intent
-  const accessibilityIntent = /\bstep-free|accessible|wheelchair|lift|elevator|ramp\b/i.test(query);
+  // Accessibility Intent (Supports EN, ES, FR, PT, AR, DE keywords)
+  const accessibilityIntent = /\bstep-free|accessible|wheelchair|lift|elevator|ramp|escalera|sin escaleras|ascensor|ascenseur|sans marches|degraus|elevador|acessibilidade|المصاعد|aufzug|barrierefrei\b/i.test(query);
   // Quiet Room Intent
-  const quietIntent = /\bquiet|sensory|calm|autism|overwhelmed\b/i.test(query);
+  const quietIntent = /\bquiet|sensory|calm|autism|overwhelmed|tranquilo|sensorial|calme|هدوء|حسية|ruhig|reizarm\b/i.test(query);
   // Transit Intent
-  const transitIntent = /\btransit|train|rail|subway|shuttle|bus|taxi|walk\b/i.test(query);
+  const transitIntent = /\btransit|train|rail|subway|shuttle|bus|taxi|walk|tren|ferrocarril|autobús|navette|metrô|ônibus|القطار|حافلة|bahn|zug\b/i.test(query);
 
   if (lang === "es") {
     let ans = `En el estadio ${venue.name}: `;
@@ -773,90 +783,98 @@ function addChatMessage(role, text, model = '') {
 }
 
 // Event Listeners Configuration
+if (typeof document !== 'undefined') {
+  // SVG map zone selection clicks & keyboard accessibility
+  document.querySelectorAll(".svg-zone").forEach((zone) => {
+    zone.addEventListener("click", () => {
+      document.querySelectorAll(".svg-zone").forEach((z) => z.classList.remove("is-selected-svg"));
+      zone.classList.add("is-selected-svg");
+      
+      const zoneName = zone.dataset.zone;
+      zoneDetail.textContent = zoneGuidance[zoneName] || "AI guidance: current metrics in normal threshold. Maintain volunteer dispatch rates.";
+      
+      // Animate map route lines for visual wow factor
+      const routeA = document.getElementById("flow-route-a");
+      const routeB = document.getElementById("flow-route-b");
+      
+      if (zoneName === "Accessible lift bank") {
+        routeA.style.display = "block";
+        routeB.style.display = "none";
+      } else if (zoneName === "Transit bridge") {
+        routeA.style.display = "none";
+        routeB.style.display = "block";
+      } else {
+        routeA.style.display = "none";
+        routeB.style.display = "none";
+      }
 
-// SVG map zone selection clicks
-document.querySelectorAll(".svg-zone").forEach((zone) => {
-  zone.addEventListener("click", () => {
-    document.querySelectorAll(".svg-zone").forEach((z) => z.classList.remove("is-selected-svg"));
-    zone.classList.add("is-selected-svg");
-    
-    const zoneName = zone.dataset.zone;
-    zoneDetail.textContent = zoneGuidance[zoneName] || "AI guidance: current metrics in normal threshold. Maintain volunteer dispatch rates.";
-    
-    // Animate map route lines for visual wow factor
-    const routeA = document.getElementById("flow-route-a");
-    const routeB = document.getElementById("flow-route-b");
-    
-    if (zoneName === "Accessible lift bank") {
-      routeA.style.display = "block";
-      routeB.style.display = "none";
-    } else if (zoneName === "Transit bridge") {
-      routeA.style.display = "none";
-      routeB.style.display = "block";
-    } else {
-      routeA.style.display = "none";
-      routeB.style.display = "none";
-    }
+      addAuditLog("Operations", `Clicked map zone: ${zoneName}`, `Zone details inspected by operator.`, "User Event", "Manual View", "Telemetry checked");
+    });
 
-    addAuditLog("Operations", `Clicked map zone: ${zoneName}`, `Zone details inspected by operator.`, "User Event", "Manual View", "Telemetry checked");
+    // Keyboard support for WCAG accessibility (Enter or Space key)
+    zone.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        zone.click();
+      }
+    });
   });
-});
 
-// Dropdown triggers
-scenarioSelect.addEventListener("change", () => {
-  currentScenario = scenarioSelect.value;
-  currentIncident = null; // Clear incident when cycling scenarios
-  incidentSelect.value = "";
-  renderScenario();
-  addAuditLog("Operations", `Scenario changed: ${currentScenario}`, `Scenario updated to ${scenarioSelect.options[scenarioSelect.selectedIndex].text}`, "System Context", "Auto-Approved", "Telemetry recalibrated");
-});
-
-venueSelect.addEventListener("change", () => {
-  const selectedName = venueProfiles[venueSelect.value].name;
-  renderScenario();
-  addChatMessage("ai", `Venue context changed to ${selectedName}. Responses now use that stadium's active ops profile.`, "System Context");
-  addAuditLog("Operations", `Venue profile changed: ${selectedName}`, `Context loaded.`, "System Context", "Auto-Approved", "SOP mapping updated");
-});
-
-incidentSelect.addEventListener("change", () => {
-  const incidentVal = incidentSelect.value;
-  if (incidentVal) {
-    currentIncident = incidentVal;
+  // Dropdown triggers
+  scenarioSelect.addEventListener("change", () => {
+    currentScenario = scenarioSelect.value;
+    currentIncident = null; // Clear incident when cycling scenarios
+    incidentSelect.value = "";
     renderScenario();
-    addAuditLog("Operations", `Incident Triggered: ${incidentOverrides[incidentVal].title}`, `Deploying emergency response briefs for ${incidentOverrides[incidentVal].zone}`, "Model Fallback Engine", "Pending Action Dispatch", "Brief generated");
-  } else {
+    addAuditLog("Operations", `Scenario changed: ${currentScenario}`, `Scenario updated to ${scenarioSelect.options[scenarioSelect.selectedIndex].text}`, "System Context", "Auto-Approved", "Telemetry recalibrated");
+  });
+
+  venueSelect.addEventListener("change", () => {
+    const selectedName = venueProfiles[venueSelect.value].name;
+    renderScenario();
+    addChatMessage("ai", `Venue context changed to ${selectedName}. Responses now use that stadium's active ops profile.`, "System Context");
+    addAuditLog("Operations", `Venue profile changed: ${selectedName}`, `Context loaded.`, "System Context", "Auto-Approved", "SOP mapping updated");
+  });
+
+  incidentSelect.addEventListener("change", () => {
+    const incidentVal = incidentSelect.value;
+    if (incidentVal) {
+      currentIncident = incidentVal;
+      renderScenario();
+      addAuditLog("Operations", `Incident Triggered: ${incidentOverrides[incidentVal].title}`, `Deploying emergency response briefs for ${incidentOverrides[incidentVal].zone}`, "Model Fallback Engine", "Pending Action Dispatch", "Brief generated");
+    } else {
+      currentIncident = null;
+      renderScenario();
+    }
+  });
+
+  // Simulate cycle scenario button
+  document.getElementById("simulateBtn").addEventListener("click", () => {
+    const options = Object.keys(scenarios);
+    const currentIndex = options.indexOf(scenarioSelect.value);
+    scenarioSelect.value = options[(currentIndex + 1) % options.length];
+    currentScenario = scenarioSelect.value;
     currentIncident = null;
+    incidentSelect.value = "";
     renderScenario();
-  }
-});
+    addAuditLog("Operations", `Scenario cycled manually`, `Updated to ${scenarioSelect.options[scenarioSelect.selectedIndex].text}`, "System Context", "Auto-Approved", "Telemetry updated");
+  });
 
-// Simulate cycle scenario button
-document.getElementById("simulateBtn").addEventListener("click", () => {
-  const options = Object.keys(scenarios);
-  const currentIndex = options.indexOf(scenarioSelect.value);
-  scenarioSelect.value = options[(currentIndex + 1) % options.length];
-  currentScenario = scenarioSelect.value;
-  currentIncident = null;
-  incidentSelect.value = "";
-  renderScenario();
-  addAuditLog("Operations", `Scenario cycled manually`, `Updated to ${scenarioSelect.options[scenarioSelect.selectedIndex].text}`, "System Context", "Auto-Approved", "Telemetry updated");
-});
-
-// Chat Form submit
-document.getElementById("chatForm").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const question = fanQuestion.value.trim();
-  if (!question) return;
-  
-  addChatMessage("fan", question);
-  fanQuestion.value = "";
-  
-  // RAG contextual system instruction construction
-  const activeVenue = venueProfiles[venueSelect.value];
-  const activeScenarioText = scenarioSelect.options[scenarioSelect.selectedIndex].text;
-  const incidentText = currentIncident ? incidentOverrides[currentIncident].title : 'None';
-  
-  const systemInstruction = `You are VenueIQ 2026, an operations copilot for the FIFA World Cup 2026. The user is a fan or volunteer.
+  // Chat Form submit
+  document.getElementById("chatForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const question = fanQuestion.value.trim();
+    if (!question) return;
+    
+    addChatMessage("fan", question);
+    fanQuestion.value = "";
+    
+    // RAG contextual system instruction construction
+    const activeVenue = venueProfiles[venueSelect.value];
+    const activeScenarioText = scenarioSelect.options[scenarioSelect.selectedIndex].text;
+    const incidentText = currentIncident ? incidentOverrides[currentIncident].title : 'None';
+    
+    const systemInstruction = `You are VenueIQ 2026, an operations copilot for the FIFA World Cup 2026. The user is a fan or volunteer.
 Current Venue: ${activeVenue.name}
 Venue Capacity: ${activeVenue.capacity}
 Transit Info: ${activeVenue.transitInfo}
@@ -866,62 +884,73 @@ Matchday Scenario: ${activeScenarioText}
 Active Incidents: ${incidentText}
 Provide a helpful, concise answer based ONLY on the venue guidelines. Cite specific elevator banks or transit lines. If they ask in another language (Spanish, French, Portuguese, Arabic, German), respond in that language.`;
 
-  // Fetch response
-  const result = await generateResponse(question, systemInstruction);
-  addChatMessage("ai", result.text, result.source);
-  
-  // Log request
-  addAuditLog("Fan Assist", `Fan: "${question}"`, result.text, result.source, "Auto-Approved", "Query resolved");
-});
-
-// Quick prompt helper buttons
-document.querySelectorAll(".quick-prompt-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    fanQuestion.value = btn.dataset.query;
-    document.getElementById("chatForm").dispatchEvent(new Event("submit"));
+    // Fetch response
+    const result = await generateResponse(question, systemInstruction);
+    addChatMessage("ai", result.text, result.source);
+    
+    // Log request
+    addAuditLog("Fan Assist", `Fan: "${question}"`, result.text, result.source, "Auto-Approved", "Query resolved");
   });
-});
 
-// Approve & Dispatch actions button
-approveDispatchBtn.addEventListener("click", () => {
-  const activeVenue = venueProfiles[venueSelect.value].name;
-  const currentContext = currentIncident ? incidentOverrides[currentIncident].title : scenarioSelect.options[scenarioSelect.selectedIndex].text;
-  
-  alert(`DISPATCH ACTION SENT SUCCESSFULLY!\n\nNotifications pushed to wayfinding teams and stewards at ${activeVenue}.\nContext: ${currentContext}`);
-  addAuditLog("Operations", `Push Broadcast Action`, `Dispatched steward task cards and SMS broadcasts for context: ${currentContext}`, "Operator Triggered", "Confirmed by Operator", "Notifications sent");
-});
+  // Quick prompt helper buttons
+  document.querySelectorAll(".quick-prompt-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      fanQuestion.value = btn.dataset.query;
+      document.getElementById("chatForm").dispatchEvent(new Event("submit"));
+    });
+  });
 
-// Eco-nudge optimizer button
-optimizeNudgeBtn.addEventListener("click", () => {
-  // Update transport split to reflect low-carbon choices (rail and shuttle rise)
-  const currentFactors = venueProfiles[venueSelect.value].carbonFactors;
-  const optimizedFactors = {
-    rail: Math.min(100, currentFactors.rail + 12),
-    shuttle: Math.min(100, currentFactors.shuttle + 6),
-    ride: Math.max(0, currentFactors.ride - 14),
-    walk: Math.max(0, currentFactors.walk - 4)
+  // Approve & Dispatch actions button
+  approveDispatchBtn.addEventListener("click", () => {
+    const activeVenue = venueProfiles[venueSelect.value].name;
+    const currentContext = currentIncident ? incidentOverrides[currentIncident].title : scenarioSelect.options[scenarioSelect.selectedIndex].text;
+    
+    alert(`DISPATCH ACTION SENT SUCCESSFULLY!\n\nNotifications pushed to wayfinding teams and stewards at ${activeVenue}.\nContext: ${currentContext}`);
+    addAuditLog("Operations", `Push Broadcast Action`, `Dispatched steward task cards and SMS broadcasts for context: ${currentContext}`, "Operator Triggered", "Confirmed by Operator", "Notifications sent");
+  });
+
+  // Eco-nudge optimizer button
+  optimizeNudgeBtn.addEventListener("click", () => {
+    // Update transport split to reflect low-carbon choices (rail and shuttle rise)
+    const currentFactors = venueProfiles[venueSelect.value].carbonFactors;
+    const optimizedFactors = {
+      rail: Math.min(100, currentFactors.rail + 12),
+      shuttle: Math.min(100, currentFactors.shuttle + 6),
+      ride: Math.max(0, currentFactors.ride - 14),
+      walk: Math.max(0, currentFactors.walk - 4)
+    };
+    
+    // Normalize factors to sum to 100
+    const sum = optimizedFactors.rail + optimizedFactors.shuttle + optimizedFactors.ride + optimizedFactors.walk;
+    if (sum !== 100) {
+      const diff = 100 - sum;
+      optimizedFactors.rail += diff;
+    }
+    
+    updateTransportBars(optimizedFactors);
+    
+    // Update UI and add log
+    ecoActiveNudges.textContent = parseInt(ecoActiveNudges.textContent) + 1;
+    alert("LOW-CARBON NUDGE ACTIVATED!\n\nPushing transit-first and pedestrian incentives to non-mobility flagged fans. Mode share updated.");
+    
+    addAuditLog("Sustainability", "Eco-Nudge Optimizer Activated", "Pushed transit/merchandise discount codes to Sections 100-150 and 210-230.", "RAG Optimiser", "Operator Confirmed", "Mode share shifted: +12% Rail");
+  });
+
+  // Clear audit logs
+  clearAuditBtn.addEventListener("click", () => {
+    if (confirm("Are you sure you want to clear the operations audit log history?")) {
+      auditLogs.length = 0;
+      renderAuditLogs();
+    }
+  });
+}
+
+// Export for Node.js Unit Testing
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+  module.exports = {
+    venueProfiles,
+    scenarios,
+    incidentOverrides,
+    generateLocalFallback
   };
-  
-  // Normalize factors to sum to 100
-  const sum = optimizedFactors.rail + optimizedFactors.shuttle + optimizedFactors.ride + optimizedFactors.walk;
-  if (sum !== 100) {
-    const diff = 100 - sum;
-    optimizedFactors.rail += diff;
-  }
-  
-  updateTransportBars(optimizedFactors);
-  
-  // Update UI and add log
-  ecoActiveNudges.textContent = parseInt(ecoActiveNudges.textContent) + 1;
-  alert("LOW-CARBON NUDGE ACTIVATED!\n\nPushing transit-first and pedestrian incentives to non-mobility flagged fans. Mode share updated.");
-  
-  addAuditLog("Sustainability", "Eco-Nudge Optimizer Activated", "Pushed transit/merchandise discount codes to Sections 100-150 and 210-230.", "RAG Optimiser", "Operator Confirmed", "Mode share shifted: +12% Rail");
-});
-
-// Clear audit logs
-clearAuditBtn.addEventListener("click", () => {
-  if (confirm("Are you sure you want to clear the operations audit log history?")) {
-    auditLogs.length = 0;
-    renderAuditLogs();
-  }
-});
+}

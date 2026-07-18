@@ -4,7 +4,8 @@
   "description": "VenueIQ 2026 World Cup ops copilot",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test"
   },
   "dependencies": {}
 }

@@ -4,9 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>VenueIQ 2026 - World Cup Operations Command Center</title>
-    <!-- Premium Google Fonts -->
+    <!-- Content Security Policy for Security -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://generativelanguage.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; media-src 'self';">
+    <!-- Premium Google Fonts & Preload for Efficiency -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
   </head>
@@ -48,19 +51,19 @@
 
         <nav class="nav-list" aria-label="Modules">
           <a href="#dashboard" class="nav-item active" data-tab="dashboard">
-            <span class="nav-icon">📊</span> Operations
+            <span class="nav-icon" role="img" aria-label="Operations Metric Chart">📊</span> Operations
           </a>
           <a href="#fan-assist" class="nav-item" data-tab="fan-assist">
-            <span class="nav-icon">💬</span> Fan Assist
+            <span class="nav-icon" role="img" aria-label="Chat Bubble">💬</span> Fan Assist
           </a>
           <a href="#sustainability" class="nav-item" data-tab="sustainability">
-            <span class="nav-icon">🌿</span> Sustainability
+            <span class="nav-icon" role="img" aria-label="Green Leaf">🌿</span> Sustainability
           </a>
           <a href="#audit-log" class="nav-item" data-tab="audit-log">
-            <span class="nav-icon">📜</span> Audit Log
+            <span class="nav-icon" role="img" aria-label="Scroll History">📜</span> Audit Log
           </a>
           <a href="#architecture" class="nav-item" data-tab="architecture">
-            <span class="nav-icon">⚙️</span> AI Architecture
+            <span class="nav-icon" role="img" aria-label="Gears Settings">⚙️</span> AI Architecture
           </a>
         </nav>
 
@@ -101,7 +104,7 @@
             <article class="metric">
               <div class="metric-header">
                 <span>Crowd Pressure</span>
-                <span class="metric-icon">👥</span>
+                <span class="metric-icon" role="img" aria-label="Crowd Density">👥</span>
               </div>
               <strong id="crowdMetric">78%</strong>
               <div class="progress-bar-container">
@@ -112,7 +115,7 @@
             <article class="metric">
               <div class="metric-header">
                 <span>Accessible Path Status</span>
-                <span class="metric-icon">♿</span>
+                <span class="metric-icon" role="img" aria-label="Accessibility Wheelchair">♿</span>
               </div>
               <strong id="accessMetric">94%</strong>
               <div class="progress-bar-container">
@@ -123,7 +126,7 @@
             <article class="metric">
               <div class="metric-header">
                 <span>Volunteer Efficiency</span>
-                <span class="metric-icon">🏃</span>
+                <span class="metric-icon" role="img" aria-label="Volunteer Running">🏃</span>
               </div>
               <strong id="staffMetric">6.8</strong>
               <div class="progress-bar-container">
@@ -134,7 +137,7 @@
             <article class="metric">
               <div class="metric-header">
                 <span>Transit Queue Recovery</span>
-                <span class="metric-icon">🚆</span>
+                <span class="metric-icon" role="img" aria-label="Transit Train">🚆</span>
               </div>
               <strong id="transitMetric">18m</strong>
               <div class="progress-bar-container">
@@ -179,16 +182,16 @@
                   
                   <!-- Seating Zones (Interactive Paths) -->
                   <!-- North Gate Zone -->
-                  <path d="M 110 80 A 265 170 0 0 1 490 80 L 415 130 A 175 110 0 0 0 185 130 Z" class="svg-zone z-hot" id="zone-north" data-zone="North gate" />
+                  <path d="M 110 80 A 265 170 0 0 1 490 80 L 415 130 A 175 110 0 0 0 185 130 Z" class="svg-zone z-hot" id="zone-north" data-zone="North gate" tabindex="0" role="button" aria-label="North Gate Seating Zone" />
                   
                   <!-- South Plaza Zone -->
-                  <path d="M 110 320 A 265 170 0 0 0 490 320 L 415 270 A 175 110 0 0 1 185 270 Z" class="svg-zone z-calm" id="zone-south" data-zone="South plaza" />
+                  <path d="M 110 320 A 265 170 0 0 0 490 320 L 415 270 A 175 110 0 0 1 185 270 Z" class="svg-zone z-calm" id="zone-south" data-zone="South plaza" tabindex="0" role="button" aria-label="South Plaza Seating Zone" />
                   
                   <!-- East Concourse Zone -->
-                  <path d="M 490 80 A 265 170 0 0 1 490 320 L 415 270 A 175 110 0 0 0 415 130 Z" class="svg-zone z-watch" id="zone-east" data-zone="East concourse" />
+                  <path d="M 490 80 A 265 170 0 0 1 490 320 L 415 270 A 175 110 0 0 0 415 130 Z" class="svg-zone z-watch" id="zone-east" data-zone="East concourse" tabindex="0" role="button" aria-label="East Concourse Seating Zone" />
                   
                   <!-- Family Entry Zone -->
-                  <path d="M 110 80 A 265 170 0 0 0 110 320 L 185 270 A 175 110 0 0 1 185 130 Z" class="svg-zone z-calm" id="zone-family" data-zone="Family entry" />
+                  <path d="M 110 80 A 265 170 0 0 0 110 320 L 185 270 A 175 110 0 0 1 185 130 Z" class="svg-zone z-calm" id="zone-family" data-zone="Family entry" tabindex="0" role="button" aria-label="Family Entry Seating Zone" />
                   
                   <!-- Inner Stadium Ring -->
                   <ellipse cx="300" cy="200" rx="175" ry="110" class="stadium-inner" />
@@ -201,13 +204,13 @@
                   <rect x="358" y="172" width="22" height="56" class="penalty-box" />
 
                   <!-- Transit Bridge (Left Top, Visual Connector) -->
-                  <path d="M 25 35 L 90 90 L 75 105 L 10 50 Z" class="svg-zone z-hot" id="zone-bridge" data-zone="Transit bridge" />
+                  <path d="M 25 35 L 90 90 L 75 105 L 10 50 Z" class="svg-zone z-hot" id="zone-bridge" data-zone="Transit bridge" tabindex="0" role="button" aria-label="Transit Bridge Pedestrian Route" />
                   <line x1="25" y1="35" x2="90" y2="90" class="bridge-rail" />
                   <line x1="10" y1="50" x2="75" y2="105" class="bridge-rail" />
                   
                   <!-- Lift Bank (Circular Entry Inside Seating Ring) -->
-                  <circle cx="195" cy="148" r="18" class="svg-zone z-watch" id="zone-lift" data-zone="Accessible lift bank" />
-                  <text x="195" y="154" class="lift-icon" text-anchor="middle">♿</text>
+                  <circle cx="195" cy="148" r="18" class="svg-zone z-watch" id="zone-lift" data-zone="Accessible lift bank" tabindex="0" role="button" aria-label="Accessible Elevator Lift Bank" />
+                  <text x="195" y="154" class="lift-icon" text-anchor="middle" aria-hidden="true">♿</text>
                   
                   <!-- Route Flow Arrow Paths (Hidden by default, shown for routing) -->
                   <path d="M 80 80 Q 150 150 195 148" class="route-line" id="flow-route-a" />

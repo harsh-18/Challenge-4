@@ -19,10 +19,20 @@ const MIME_TYPES = {
 const server = http.createServer(async (req, res) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
 
-  // CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Secure CORS origin validation
+  const origin = req.headers.origin;
+  if (origin && (origin.startsWith('http://localhost') || origin.includes('github.io'))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Security Headers
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 
   if (req.method === 'OPTIONS') {
     res.writeHead(204);
@@ -120,6 +130,13 @@ const server = http.createServer(async (req, res) => {
 
     const ext = path.extname(filePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+
+    // Caching headers for efficiency
+    if (ext === '.html') {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    } else {
+      res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year cache for static assets
+    }
 
     res.writeHead(200, { 'Content-Type': contentType });
     const stream = fs.createReadStream(filePath);
