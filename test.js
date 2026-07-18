@@ -62,6 +62,34 @@ test('VenueIQ 2026 Local RAG Fallback Engine Tests', async (t) => {
     assert.match(result, /Bahnverbindung/);
   });
 
+  await t.test('returns Hindi translation on Hindi keywords', () => {
+    const prompt = 'बिना सीढ़ियों वाला रास्ता हिंदी में';
+    const result = generateLocalFallback(prompt);
+    assert.match(result, /स्टेडियम/);
+    assert.match(result, /फैमिली प्रवेश/);
+  });
+
+  await t.test('returns Bengali translation on Bengali keywords', () => {
+    const prompt = 'মেট্রো স্টেশন বাংলাতে';
+    const result = generateLocalFallback(prompt);
+    assert.match(result, /স্টেডিয়াম/);
+    assert.match(result, /ট্রানজিট/);
+  });
+
+  await t.test('returns Tamil translation on Tamil keywords', () => {
+    const prompt = 'அமைதி அறை தமிழ்';
+    const result = generateLocalFallback(prompt);
+    assert.match(result, /விளையாட்டரங்கம்/);
+    assert.match(result, /உணர்வு அறை/);
+  });
+
+  await t.test('returns Kannada translation on Kannada keywords', () => {
+    const prompt = 'ಕನ್ನಡದಲ್ಲಿ ಲಿಫ್ಟ್ ಎಲ್ಲಿದೆ';
+    const result = generateLocalFallback(prompt);
+    assert.match(result, /ಕ್ರೀಡಾಂಗಣ/);
+    assert.match(result, /ಲಿಫ್ಟ್ ಸೌಲಭ್ಯ/);
+  });
+
   await t.test('returns English fallback default on general input', () => {
     const prompt = 'Where is the nearest wheelchair accessible elevator?';
     const result = generateLocalFallback(prompt);

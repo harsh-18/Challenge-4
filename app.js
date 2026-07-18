@@ -451,13 +451,17 @@ function generateLocalFallback(prompt, systemInstruction) {
   else if (/\bportuguese\b|português|portugues/i.test(query)) lang = "pt";
   else if (/\barabic\b|عربي/i.test(query)) lang = "ar";
   else if (/\bgerman|deutsch\b/i.test(query)) lang = "de";
+  else if (/\bhindi\b|हिंदी|हिन्दी/i.test(query)) lang = "hi";
+  else if (/\bbengali\b|বাংলা/i.test(query)) lang = "bn";
+  else if (/\btamil\b|தமிழ்/i.test(query)) lang = "ta";
+  else if (/\bkannada\b|ಕನ್ನಡ/i.test(query)) lang = "kn";
 
-  // Accessibility Intent (Supports EN, ES, FR, PT, AR, DE keywords)
-  const accessibilityIntent = /\bstep-free|accessible|wheelchair|lift|elevator|ramp|escalera|sin escaleras|ascensor|ascenseur|sans marches|degraus|elevador|acessibilidade|المصاعد|aufzug|barrierefrei\b/i.test(query);
+  // Accessibility Intent (Supports EN, ES, FR, PT, AR, DE, and Indic keywords)
+  const accessibilityIntent = /\bstep-free|accessible|wheelchair|lift|elevator|ramp|escalera|sin escaleras|ascensor|ascenseur|sans marches|degraus|elevador|acessibilidade|المصاعد|aufzug|barrierefrei\b|सीढ़ी|बिना सीढ़ियों|लिफ्ट|ह्वीलचेयर|সিঁড়ি|হুইলচেয়ার|படிக்கட்டுகள்|லிஃப்ட்|ಮೆಟ್ಟಿಲು|ಲಿಫ್ಟ್/i.test(query);
   // Quiet Room Intent
-  const quietIntent = /\bquiet|sensory|calm|autism|overwhelmed|tranquilo|sensorial|calme|هدوء|حسية|ruhig|reizarm\b/i.test(query);
+  const quietIntent = /\bquiet|sensory|calm|autism|overwhelmed|tranquilo|sensorial|calme|هدوء|حسية|ruhig|reizarm\b|शांत|সেন্সরি|அமைதி|ಶಾಂತ/i.test(query);
   // Transit Intent
-  const transitIntent = /\btransit|train|rail|subway|shuttle|bus|taxi|walk|tren|ferrocarril|autobús|navette|metrô|ônibus|القطار|حافلة|bahn|zug\b/i.test(query);
+  const transitIntent = /\btransit|train|rail|subway|shuttle|bus|taxi|walk|tren|ferrocarril|autobús|navette|metrô|ônibus|القطار|حافلة|bahn|zug\b|रेल|मेट्रो|बस|ट्रेन|রেল|মেট্রো|বাস|ট্রেন|இரயில்|பேருந்து|ರೈಲು|ಬಸ್/i.test(query);
 
   if (lang === "es") {
     let ans = `En el estadio ${venue.name}: `;
@@ -521,6 +525,62 @@ function generateLocalFallback(prompt, systemInstruction) {
       ans += `besuchen Sie den beruhigten sensorischen Raum. ${venue.quietPaths}`;
     } else {
       ans += `wir empfehlen die umweltfreundliche Bahnverbindung. ${venue.transitInfo}`;
+    }
+    return ans;
+  }
+
+  if (lang === "hi") {
+    let ans = `स्टेडियम ${venue.name} में: `;
+    if (accessibilityIntent) {
+      ans += `बिना सीढ़ियों वाले रास्ते के लिए कृपया फैमिली प्रवेश द्वार का उपयोग करें। लिफ्ट उपलब्ध है। ${venue.accessPaths}`;
+    } else if (quietIntent) {
+      ans += `कृपया निर्दिष्ट शांत सेंसरी कक्ष में जाएं। ${venue.quietPaths}`;
+    } else if (transitIntent) {
+      ans += `कम कार्बन उत्सर्जन वाले सार्वजनिक रेलवे मार्ग की सिफारिश की जाती है। ${venue.transitInfo}`;
+    } else {
+      ans += `प्रवेश के लिए सबसे साफ़ मार्ग साउथ प्लाजा से होकर जाता है जहां भीड़ कम है।`;
+    }
+    return ans;
+  }
+
+  if (lang === "bn") {
+    let ans = `স্টেডিয়াম ${venue.name}-এ: `;
+    if (accessibilityIntent) {
+      ans += `সিঁড়িবিহীন অ্যাক্সেস রুটের জন্য ফ্যামিলি এন্ট্রি ব্যবহার করুন। লিফট উপলব্ধ রয়েছে। ${venue.accessPaths}`;
+    } else if (quietIntent) {
+      ans += `নির্দিষ্ট শান্ত সেন্সরি রুমে চলে যান। ${venue.quietPaths}`;
+    } else if (transitIntent) {
+      ans += `কম কার্বন নির্গমনকারী ট্রেন বা পাবলিক রেল ট্রানজিট ব্যবহার করার পরামর্শ দেওয়া হচ্ছে। ${venue.transitInfo}`;
+    } else {
+      ans += `প্রবেশের জন্য সবচেয়ে পরিষ্কার পথটি সাউথ প্লাজা দিয়ে গেছে।`;
+    }
+    return ans;
+  }
+
+  if (lang === "ta") {
+    let ans = `விளையாட்டரங்கம் ${venue.name} இல்: `;
+    if (accessibilityIntent) {
+      ans += `படிக்கட்டுகள் இல்லாத எளிதான வழிக்கு குடும்ப நுழைவாயிலைப் பயன்படுத்தவும். லிஃப்ட் வசதி உள்ளது. ${venue.accessPaths}`;
+    } else if (quietIntent) {
+      ans += `அமைதியான உணர்வு அறைக்குச் செல்லவும். ${venue.quietPaths}`;
+    } else if (transitIntent) {
+      ans += `சுற்றுச்சூழலுக்கு உகந்த இரயில் போக்குவரத்தைப் பயன்படுத்த பரிந்துரைக்கப்படுகிறது. ${venue.transitInfo}`;
+    } else {
+      ans += `தெற்கு பிளாசா வழியாக செல்வது மிகவும் தெளிவான பாதையாகும்.`;
+    }
+    return ans;
+  }
+
+  if (lang === "kn") {
+    let ans = `ಕ್ರೀಡಾಂಗಣ ${venue.name} ನಲ್ಲಿ: `;
+    if (accessibilityIntent) {
+      ans += `ಮೆಟ್ಟಿಲು ರಹಿತ ಸುಲಭ ಮಾರ್ಗಕ್ಕಾಗಿ ಫ್ಯಾಮಿಲಿ ಎಂಟ್ರಿ ಬಳಸಿ. ಲಿಫ್ಟ್ ಸೌಲಭ್ಯ ಲಭ್ಯವಿದೆ. ${venue.accessPaths}`;
+    } else if (quietIntent) {
+      ans += `ನಿಗದಿತ ಶಾಂತ ಸೆನ್ಸರಿ ಕೊಠಡಿಗೆ ಭೇಟಿ ನೀಡಿ. ${venue.quietPaths}`;
+    } else if (transitIntent) {
+      ans += `ಕಡಿಮೆ ಇಂಗಾಲದ ರೈಲು ಸಾರಿಗೆಯನ್ನು ಬಳಸಲು ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ. ${venue.transitInfo}`;
+    } else {
+      ans += `ಸೌತ್ ಪ್ಲಾಜಾ ಮೂಲಕ ಪ್ರವೇಶಿಸುವುದು ಅತ್ಯಂತ ಸ್ಪಷ್ಟ ಮಾರ್ಗವಾಗಿದೆ.`;
     }
     return ans;
   }
@@ -769,6 +829,10 @@ function addChatMessage(role, text, model = '') {
     else if (text.includes("No estádio")) lang = 'pt-BR';
     else if (text.includes("ملعب")) lang = 'ar-AE';
     else if (text.includes("Stadion")) lang = 'de-DE';
+    else if (text.includes("स्टेडियम") || text.includes("प्रवेश द्वार")) lang = 'hi-IN';
+    else if (text.includes("স্টেডিয়াম") || text.includes("এন্ট্রি")) lang = 'bn-IN';
+    else if (text.includes("விளையாட்டரங்கம்") || text.includes("நுழைவாயிலைப்")) lang = 'ta-IN';
+    else if (text.includes("ಕ್ರೀಡಾಂಗಣ") || text.includes("ಎಂಟ್ರಿ")) lang = 'kn-IN';
     
     speakBtn.addEventListener("click", (e) => {
       e.stopPropagation();
