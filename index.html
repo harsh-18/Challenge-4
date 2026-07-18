@@ -3,192 +3,504 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>VenueIQ 2026</title>
+    <title>VenueIQ 2026 - World Cup Operations Command Center</title>
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <div class="app-shell">
+      <!-- Sidebar Control Panel -->
       <aside class="sidebar" aria-label="Venue controls">
         <a class="brand" href="#dashboard" aria-label="VenueIQ dashboard">
-          <span class="brand-mark">VQ</span>
+          <div class="brand-logo">
+            <span class="brand-mark">VQ</span>
+          </div>
           <span>
-            <strong>VenueIQ</strong>
-            <small>World Cup ops copilot</small>
+            <strong>VenueIQ 2026</strong>
+            <small>World Cup Ops Copilot</small>
           </span>
         </a>
 
-        <label class="field">
-          <span>Venue</span>
-          <select id="venueSelect">
-            <option value="ny">New York New Jersey Stadium</option>
-            <option value="atl">Atlanta Stadium</option>
-            <option value="mx">Mexico City Stadium</option>
-            <option value="van">BC Place Vancouver</option>
-          </select>
-        </label>
+        <div class="sidebar-controls">
+          <label class="field">
+            <span>Stadium Venue</span>
+            <select id="venueSelect">
+              <option value="ny">New York New Jersey Stadium</option>
+              <option value="atl">Atlanta Stadium</option>
+              <option value="mx">Mexico City Stadium</option>
+              <option value="van">BC Place Vancouver</option>
+            </select>
+          </label>
 
-        <label class="field">
-          <span>Scenario</span>
-          <select id="scenarioSelect">
-            <option value="pregame">Pregame arrival</option>
-            <option value="halftime">Halftime surge</option>
-            <option value="weather">Weather delay</option>
-            <option value="egress">Post-match egress</option>
-          </select>
-        </label>
+          <label class="field">
+            <span>Matchday Scenario</span>
+            <select id="scenarioSelect">
+              <option value="pregame">Pregame arrival</option>
+              <option value="halftime">Halftime surge</option>
+              <option value="weather">Weather delay</option>
+              <option value="egress">Post-match egress</option>
+            </select>
+          </label>
+        </div>
 
-        <div class="nav-list" aria-label="Modules">
-          <a href="#dashboard">Operations</a>
-          <a href="#fan-assist">Fan assist</a>
-          <a href="#sustainability">Sustainability</a>
-          <a href="#architecture">AI architecture</a>
+        <nav class="nav-list" aria-label="Modules">
+          <a href="#dashboard" class="nav-item active" data-tab="dashboard">
+            <span class="nav-icon">📊</span> Operations
+          </a>
+          <a href="#fan-assist" class="nav-item" data-tab="fan-assist">
+            <span class="nav-icon">💬</span> Fan Assist
+          </a>
+          <a href="#sustainability" class="nav-item" data-tab="sustainability">
+            <span class="nav-icon">🌿</span> Sustainability
+          </a>
+          <a href="#audit-log" class="nav-item" data-tab="audit-log">
+            <span class="nav-icon">📜</span> Audit Log
+          </a>
+          <a href="#architecture" class="nav-item" data-tab="architecture">
+            <span class="nav-icon">⚙️</span> AI Architecture
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="status-indicator">
+            <span class="status-dot online"></span>
+            <span id="apiStatusText">Live API Active</span>
+          </div>
         </div>
       </aside>
 
+      <!-- Main Dashboard Area -->
       <main>
-        <section class="hero" id="dashboard">
-          <div class="hero-copy">
-            <p class="eyebrow">FIFA World Cup 2026 matchday command center</p>
-            <h1>GenAI guidance for safer, faster, more inclusive stadium operations.</h1>
-            <p>
-              VenueIQ turns live venue telemetry, transit feeds, weather, volunteer reports,
-              and fan questions into multilingual instructions, crowd forecasts, and
-              operator-ready action plans.
-            </p>
-          </div>
-          <div class="hero-visual" role="img" aria-label="Stylized stadium operations map">
-            <div class="pitch">
-              <span class="route route-a"></span>
-              <span class="route route-b"></span>
-              <span class="zone zone-hot">A</span>
-              <span class="zone zone-watch">B</span>
-              <span class="zone zone-calm">C</span>
-              <span class="pulse"></span>
+        <!-- Tab Content: Operations -->
+        <div id="tab-dashboard" class="tab-content active-content">
+          <section class="hero">
+            <div class="hero-copy">
+              <p class="eyebrow">FIFA World Cup 2026 Command Center</p>
+              <h1>GenAI Operations & Crowd intelligence</h1>
+              <p>
+                VenueIQ aggregates live telemetry, transit flows, and volunteer notes to model 
+                crowd pressure, generate operator dispatch briefs, and coordinate multilingual support.
+              </p>
             </div>
-          </div>
-        </section>
+            <div class="hero-badge">
+              <span class="fifa-pill">Host City Operations</span>
+            </div>
+          </section>
 
-        <section class="metric-grid" aria-label="Live venue metrics">
-          <article class="metric">
-            <span>Crowd pressure</span>
-            <strong id="crowdMetric">78%</strong>
-            <small id="crowdDelta">Gate A rising in 12 min</small>
-          </article>
-          <article class="metric">
-            <span>Accessible routes</span>
-            <strong id="accessMetric">94%</strong>
-            <small>Step-free paths available</small>
-          </article>
-          <article class="metric">
-            <span>Volunteer load</span>
-            <strong id="staffMetric">6.8</strong>
-            <small>Tasks per zone lead</small>
-          </article>
-          <article class="metric">
-            <span>Transit recovery</span>
-            <strong id="transitMetric">18m</strong>
-            <small>Average queue clearance</small>
-          </article>
-        </section>
+          <!-- Live Telemetry Metrics -->
+          <section class="metric-grid" aria-label="Live venue metrics">
+            <article class="metric">
+              <div class="metric-header">
+                <span>Crowd Pressure</span>
+                <span class="metric-icon">👥</span>
+              </div>
+              <strong id="crowdMetric">78%</strong>
+              <div class="progress-bar-container">
+                <div class="progress-bar" id="crowdProgress" style="width: 78%"></div>
+              </div>
+              <small id="crowdDelta">Gate A rising in 12 min</small>
+            </article>
+            <article class="metric">
+              <div class="metric-header">
+                <span>Accessible Path Status</span>
+                <span class="metric-icon">♿</span>
+              </div>
+              <strong id="accessMetric">94%</strong>
+              <div class="progress-bar-container">
+                <div class="progress-bar success" id="accessProgress" style="width: 94%"></div>
+              </div>
+              <small>Step-free paths cleared</small>
+            </article>
+            <article class="metric">
+              <div class="metric-header">
+                <span>Volunteer Efficiency</span>
+                <span class="metric-icon">🏃</span>
+              </div>
+              <strong id="staffMetric">6.8</strong>
+              <div class="progress-bar-container">
+                <div class="progress-bar info" id="staffProgress" style="width: 68%"></div>
+              </div>
+              <small>Tasks per zone lead</small>
+            </article>
+            <article class="metric">
+              <div class="metric-header">
+                <span>Transit Queue Recovery</span>
+                <span class="metric-icon">🚆</span>
+              </div>
+              <strong id="transitMetric">18m</strong>
+              <div class="progress-bar-container">
+                <div class="progress-bar warning" id="transitProgress" style="width: 55%"></div>
+              </div>
+              <small>Average queue clearance</small>
+            </article>
+          </section>
 
-        <section class="ops-layout">
-          <article class="panel flow-panel">
+          <!-- Interactive Stadium Layout & AI Briefs -->
+          <section class="ops-layout">
+            <!-- Left Panel: Animated Stadium Map -->
+            <article class="panel map-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Interactive Stadium Layout</p>
+                  <h2>Crowd pressure map</h2>
+                </div>
+                <div class="map-legend">
+                  <span class="legend-item"><span class="legend-color hot"></span>Hot</span>
+                  <span class="legend-item"><span class="legend-color watch"></span>Watch</span>
+                  <span class="legend-item"><span class="legend-color calm"></span>Calm</span>
+                </div>
+              </div>
+              
+              <!-- SVG Stadium Drawing -->
+              <div class="stadium-map-container">
+                <svg viewBox="0 0 600 400" id="stadiumSvg" class="interactive-stadium-svg" aria-label="Animated stadium zone status map">
+                  <defs>
+                    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#ff1744" stop-opacity="0.4" />
+                      <stop offset="100%" stop-color="#ff1744" stop-opacity="0" />
+                    </radialGradient>
+                    <filter id="shadow-effect" x="-10%" y="-10%" width="120%" height="120%">
+                      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.4" />
+                    </filter>
+                  </defs>
+                  
+                  <!-- Outer Ground Ring -->
+                  <ellipse cx="300" cy="200" rx="275" ry="180" class="stadium-base" filter="url(#shadow-effect)" />
+                  <ellipse cx="300" cy="200" rx="265" ry="170" class="stadium-outer" />
+                  
+                  <!-- Seating Zones (Interactive Paths) -->
+                  <!-- North Gate Zone -->
+                  <path d="M 110 80 A 265 170 0 0 1 490 80 L 415 130 A 175 110 0 0 0 185 130 Z" class="svg-zone z-hot" id="zone-north" data-zone="North gate" />
+                  
+                  <!-- South Plaza Zone -->
+                  <path d="M 110 320 A 265 170 0 0 0 490 320 L 415 270 A 175 110 0 0 1 185 270 Z" class="svg-zone z-calm" id="zone-south" data-zone="South plaza" />
+                  
+                  <!-- East Concourse Zone -->
+                  <path d="M 490 80 A 265 170 0 0 1 490 320 L 415 270 A 175 110 0 0 0 415 130 Z" class="svg-zone z-watch" id="zone-east" data-zone="East concourse" />
+                  
+                  <!-- Family Entry Zone -->
+                  <path d="M 110 80 A 265 170 0 0 0 110 320 L 185 270 A 175 110 0 0 1 185 130 Z" class="svg-zone z-calm" id="zone-family" data-zone="Family entry" />
+                  
+                  <!-- Inner Stadium Ring -->
+                  <ellipse cx="300" cy="200" rx="175" ry="110" class="stadium-inner" />
+                  
+                  <!-- Centered Soccer Pitch -->
+                  <rect x="220" y="145" width="160" height="110" rx="6" class="pitch-field" />
+                  <circle cx="300" cy="200" r="24" class="pitch-center-circle" />
+                  <line x1="300" y1="145" x2="300" y2="255" class="pitch-half-line" />
+                  <rect x="220" y="172" width="22" height="56" class="penalty-box" />
+                  <rect x="358" y="172" width="22" height="56" class="penalty-box" />
+
+                  <!-- Transit Bridge (Left Top, Visual Connector) -->
+                  <path d="M 25 35 L 90 90 L 75 105 L 10 50 Z" class="svg-zone z-hot" id="zone-bridge" data-zone="Transit bridge" />
+                  <line x1="25" y1="35" x2="90" y2="90" class="bridge-rail" />
+                  <line x1="10" y1="50" x2="75" y2="105" class="bridge-rail" />
+                  
+                  <!-- Lift Bank (Circular Entry Inside Seating Ring) -->
+                  <circle cx="195" cy="148" r="18" class="svg-zone z-watch" id="zone-lift" data-zone="Accessible lift bank" />
+                  <text x="195" y="154" class="lift-icon" text-anchor="middle">♿</text>
+                  
+                  <!-- Route Flow Arrow Paths (Hidden by default, shown for routing) -->
+                  <path d="M 80 80 Q 150 150 195 148" class="route-line" id="flow-route-a" />
+                  <path d="M 300 320 Q 300 240 300 200" class="route-line" id="flow-route-b" />
+
+                  <!-- Text Labels for Live Stats -->
+                  <text x="300" y="55" class="svg-label" text-anchor="middle">North Gate</text>
+                  <text x="300" y="70" class="svg-pct" id="pct-north" text-anchor="middle">82%</text>
+                  
+                  <text x="300" y="348" class="svg-label" text-anchor="middle">South Plaza</text>
+                  <text x="300" y="363" class="svg-pct" id="pct-south" text-anchor="middle">39%</text>
+                  
+                  <text x="500" y="195" class="svg-label" text-anchor="middle">East Concourse</text>
+                  <text x="500" y="210" class="svg-pct" id="pct-east" text-anchor="middle">63%</text>
+                  
+                  <text x="100" y="195" class="svg-label" text-anchor="middle">Family Entry</text>
+                  <text x="100" y="210" class="svg-pct" id="pct-family" text-anchor="middle">45%</text>
+                  
+                  <text x="50" y="22" class="svg-label" text-anchor="middle">Transit Bridge</text>
+                  <text x="50" y="35" class="svg-pct" id="pct-bridge" text-anchor="middle">76%</text>
+                  
+                  <text x="195" y="122" class="svg-label" text-anchor="middle">Lift Bank</text>
+                  <text x="195" y="132" class="svg-pct" id="pct-lift" text-anchor="middle">58%</text>
+                </svg>
+              </div>
+
+              <!-- Selected Zone Details -->
+              <div class="selected-detail-box">
+                <p id="zoneDetail" class="selected-detail">Select a stadium zone on the map to inspect live AI operator guidance.</p>
+              </div>
+            </article>
+
+            <!-- Right Panel: Incident Brief & Decision Support -->
+            <article class="panel brief-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Decision Support & Dispatch</p>
+                  <h2>AI incident briefs</h2>
+                </div>
+                <div class="panel-header-actions">
+                  <span class="status-pill" id="riskPill">Elevated</span>
+                </div>
+              </div>
+
+              <!-- Incident Simulation Panel -->
+              <div class="simulation-controls">
+                <label class="sr-only" for="incidentSelect">Trigger Simulation</label>
+                <select id="incidentSelect" class="select-small">
+                  <option value="">-- Trigger Incident --</option>
+                  <option value="gate_fail">Gate A Ticket Scanner Failure</option>
+                  <option value="lift_maintenance">Concourse Elevator Down</option>
+                  <option value="plaza_jam">Transit Platform Congestion</option>
+                  <option value="storm">Severe Thunderstorm Alert</option>
+                </select>
+                <button id="simulateBtn" type="button" class="btn-secondary">Cycle Scenario</button>
+              </div>
+
+              <!-- Live AI Incident Briefs -->
+              <div id="briefList" class="brief-list"></div>
+
+              <!-- Human Approval Action -->
+              <div class="approval-panel">
+                <p class="security-note">⚠️ High-impact dispatch instructions require operator confirmation before push notification is sent to stewards.</p>
+                <div class="approval-buttons">
+                  <button id="approveDispatchBtn" class="btn-primary btn-block">Approve & Dispatch Actions</button>
+                </div>
+              </div>
+            </article>
+          </section>
+        </div>
+
+        <!-- Tab Content: Fan Assist -->
+        <div id="tab-fan-assist" class="tab-content">
+          <section class="assist-grid">
+            <!-- Left Side: Interactive Copilot Chat -->
+            <article class="panel chat-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Multilingual Guest Copilot</p>
+                  <h2>Ask VenueIQ Assistant</h2>
+                </div>
+                <span class="ai-powered-badge">Gemini RAG Grounded</span>
+              </div>
+
+              <div class="quick-prompts">
+                <button class="quick-prompt-btn" data-query="I need a quiet step-free route to section 214 in Spanish">♿ Section 214 Route (ES)</button>
+                <button class="quick-prompt-btn" data-query="Where is the shuttle to downtown in French?">🚌 Shuttle Stop (FR)</button>
+                <button class="quick-prompt-btn" data-query="Is the sensory room open? What is the noise level?">🔇 Sensory Quiet Room (EN)</button>
+                <button class="quick-prompt-btn" data-query="Where is the closest light rail station? in Portuguese">🚆 Light Rail (PT)</button>
+              </div>
+
+              <div class="chat-window" id="chatWindow" aria-live="polite"></div>
+
+              <form class="chat-form" id="chatForm">
+                <label class="sr-only" for="fanQuestion">Ask a question</label>
+                <input id="fanQuestion" type="text" placeholder="Type Section route, translation request, transit or accessibility questions..." autocomplete="off">
+                <button type="submit" class="btn-primary">Generate</button>
+              </form>
+            </article>
+
+            <!-- Right Side: Steward Dispatch & Live volunteer coordination -->
+            <article class="panel dispatch-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Steward Orchestration</p>
+                  <h2>Recommended task dispatch</h2>
+                </div>
+                <span class="steward-count">14 Active Stewards</span>
+              </div>
+              
+              <ul class="dispatch-list" id="dispatchList"></ul>
+
+              <div class="volunteer-tracker">
+                <h3>Live Volunteer Allocations</h3>
+                <div class="volunteer-split">
+                  <div class="volunteer-stat">
+                    <strong>8</strong>
+                    <span>Wayfinding Leads</span>
+                  </div>
+                  <div class="volunteer-stat">
+                    <strong>4</strong>
+                    <span>Accessibility Captains</span>
+                  </div>
+                  <div class="volunteer-stat">
+                    <strong>2</strong>
+                    <span>Bilingual Translators</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </section>
+        </div>
+
+        <!-- Tab Content: Sustainability -->
+        <div id="tab-sustainability" class="tab-content">
+          <section class="panel sustainability-dashboard">
+            <div class="sustainability-layout">
+              <div class="sustainability-info">
+                <p class="eyebrow">Eco-Friendly Operations</p>
+                <h2>Low-Carbon Transport Routing</h2>
+                <p>
+                  VenueIQ dynamically guides fans and venue staff to optimized low-carbon travel channels. 
+                  Incentives are auto-generated when crowd pressure surges or rail/shuttle systems have spare capacity.
+                </p>
+                
+                <div class="sustainability-stats">
+                  <div class="eco-stat">
+                    <strong>1.4 Tons</strong>
+                    <span>Est. Carbon Saved Today</span>
+                  </div>
+                  <div class="eco-stat">
+                    <strong id="ecoActiveNudges">3</strong>
+                    <span>Active Nudges Sent</span>
+                  </div>
+                </div>
+
+                <div class="nudge-optimizer-box">
+                  <h3>AI Environmental Nudge Recommendation</h3>
+                  <p class="nudge-desc" id="nudgeRecommendation">
+                    Recommend rail transit to sections 100-150 and push free transit vouchers to offset Gate A congestion.
+                  </p>
+                  <button id="optimizeNudgeBtn" class="btn-success">Deploy Low-Carbon Incentives</button>
+                </div>
+              </div>
+
+              <!-- Carbon bars and statistics -->
+              <div class="transport-charts">
+                <h3>Current Mode-Share Split (%)</h3>
+                <div class="transport-bars" aria-label="Transport split">
+                  <div class="bar-row">
+                    <span class="bar-label">Rail Link</span>
+                    <div class="bar-bg">
+                      <div class="bar-fill rail" id="bar-rail" style="--value: 48"></div>
+                    </div>
+                    <span class="bar-value" id="val-rail">48%</span>
+                  </div>
+                  <div class="bar-row">
+                    <span class="bar-label">Shuttle Bus</span>
+                    <div class="bar-bg">
+                      <div class="bar-fill shuttle" id="bar-shuttle" style="--value: 26"></div>
+                    </div>
+                    <span class="bar-value" id="val-shuttle">26%</span>
+                  </div>
+                  <div class="bar-row">
+                    <span class="bar-label">Ride Hail</span>
+                    <div class="bar-bg">
+                      <div class="bar-fill ride" id="bar-ride" style="--value: 18"></div>
+                    </div>
+                    <span class="bar-value" id="val-ride">18%</span>
+                  </div>
+                  <div class="bar-row">
+                    <span class="bar-label">Pedestrian</span>
+                    <div class="bar-bg">
+                      <div class="bar-fill pedestrian" id="bar-walk" style="--value: 8"></div>
+                    </div>
+                    <span class="bar-value" id="val-walk">8%</span>
+                  </div>
+                </div>
+                <small class="chart-disclaimer">Aggregated via gate exit scans and public transit tap-in sensors.</small>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Tab Content: Audit Log -->
+        <div id="tab-audit-log" class="tab-content">
+          <section class="panel audit-panel">
             <div class="panel-heading">
               <div>
-                <p class="eyebrow">Predictive crowd management</p>
-                <h2>Heat map and gate actions</h2>
+                <p class="eyebrow">Compliance, Transparency & Audit</p>
+                <h2>Operations Decisions & Model Invocations</h2>
               </div>
-              <button id="simulateBtn" type="button">Run forecast</button>
+              <button id="clearAuditBtn" class="btn-danger btn-small">Clear Logs</button>
             </div>
-            <div class="stadium-map" aria-label="Crowd pressure by stadium zone">
-              <button class="map-zone z1" data-zone="North gate">North<br><b>82%</b></button>
-              <button class="map-zone z2" data-zone="Transit bridge">Bridge<br><b>76%</b></button>
-              <button class="map-zone z3" data-zone="Family entry">Family<br><b>45%</b></button>
-              <button class="map-zone z4" data-zone="East concourse">East<br><b>63%</b></button>
-              <button class="map-zone z5" data-zone="Accessible lift bank">Lift<br><b>58%</b></button>
-              <button class="map-zone z6" data-zone="South plaza">South<br><b>39%</b></button>
-            </div>
-            <p id="zoneDetail" class="selected-detail">Select a zone to see AI-generated operator guidance.</p>
-          </article>
+            
+            <p>Every operational alert, human approval, fan query, and RAG retrieval event is logged below for transparency and post-match audit reporting.</p>
 
-          <article class="panel">
+            <div class="table-container">
+              <table class="audit-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Module</th>
+                    <th>Input/Context</th>
+                    <th>AI Recommendation</th>
+                    <th>AI Confidence / Model</th>
+                    <th>Operator Approval</th>
+                    <th>Est. Outcome</th>
+                  </tr>
+                </thead>
+                <tbody id="auditLogBody">
+                  <!-- Log entries will be inserted here dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <!-- Tab Content: Architecture -->
+        <div id="tab-architecture" class="tab-content">
+          <section class="panel architecture-dashboard">
             <div class="panel-heading">
               <div>
-                <p class="eyebrow">Decision support</p>
-                <h2>AI incident brief</h2>
+                <p class="eyebrow">Trustworthy GenAI Systems</p>
+                <h2>Responsible RAG Architecture</h2>
               </div>
-              <span class="status-pill" id="riskPill">Elevated</span>
             </div>
-            <div id="briefList" class="brief-list"></div>
-          </article>
-        </section>
+            
+            <p class="intro-p">VenueIQ does not generate responses freely; it utilizes Retrieval-Augmented Generation (RAG) grounded in the official Stadium SOP databases.</p>
 
-        <section class="assist-grid" id="fan-assist">
-          <article class="panel">
-            <p class="eyebrow">Multilingual fan copilot</p>
-            <h2>Ask VenueIQ</h2>
-            <div class="chat-window" id="chatWindow" aria-live="polite"></div>
-            <form class="chat-form" id="chatForm">
-              <label class="sr-only" for="fanQuestion">Fan question</label>
-              <input id="fanQuestion" type="text" value="I need a quiet step-free route to section 214 in Spanish" autocomplete="off">
-              <button type="submit">Generate</button>
-            </form>
-          </article>
+            <div class="architecture-grid">
+              <article>
+                <div class="step-num">1</div>
+                <h3>Telemetry Ingestion</h3>
+                <p>Monitors gate sensor volumes, public transit bridge pressure, weather radar feeds, and elevator elevator logs.</p>
+              </article>
+              <article>
+                <div class="step-num">2</div>
+                <h3>SOP Matcher (RAG)</h3>
+                <p>Retrieves matches from vector index of approved FIFA venue security guides, host city policies, and translation lexicons.</p>
+              </article>
+              <article>
+                <div class="step-num">3</div>
+                <h3>Contextual Reasoner</h3>
+                <p>Constructs structured instruction prompts citing specific map gates, lift numbers, and language translations.</p>
+              </article>
+              <article>
+                <div class="step-num">4</div>
+                <h3>Human Approval Loop</h3>
+                <p>Requires an operator's approval for high-risk steward instructions, pushing to public PA systems, or dispatching responders.</p>
+              </article>
+            </div>
 
-          <article class="panel">
-            <p class="eyebrow">Volunteer orchestration</p>
-            <h2>Suggested dispatch</h2>
-            <ul class="dispatch-list" id="dispatchList"></ul>
-          </article>
-        </section>
-
-        <section class="panel sustainability" id="sustainability">
-          <div>
-            <p class="eyebrow">Sustainability and transport</p>
-            <h2>Low-carbon routing nudges</h2>
-            <p>
-              The assistant personalizes exits by mobility need, language, destination,
-              and real-time transit capacity, then sends concise nudges to fans and staff.
-            </p>
-          </div>
-          <div class="transport-bars" aria-label="Transport split">
-            <span style="--value: 48"><b>Rail</b></span>
-            <span style="--value: 26"><b>Shuttle</b></span>
-            <span style="--value: 18"><b>Ride hail</b></span>
-            <span style="--value: 8"><b>Walk</b></span>
-          </div>
-        </section>
-
-        <section class="architecture" id="architecture">
-          <div>
-            <p class="eyebrow">Responsible GenAI design</p>
-            <h2>How the system works</h2>
-          </div>
-          <div class="architecture-grid">
-            <article>
-              <span>1</span>
-              <h3>Ingest</h3>
-              <p>Ticket scans, CCTV counts, steward notes, accessibility requests, weather, and transit APIs.</p>
-            </article>
-            <article>
-              <span>2</span>
-              <h3>Reason</h3>
-              <p>RAG grounds responses in venue SOPs, maps, policies, and current sensor snapshots.</p>
-            </article>
-            <article>
-              <span>3</span>
-              <h3>Act</h3>
-              <p>Generates fan replies, radio scripts, dispatch tasks, and escalation summaries with approvals.</p>
-            </article>
-            <article>
-              <span>4</span>
-              <h3>Audit</h3>
-              <p>Logs source snippets, confidence, decision owner, language, and post-incident outcomes.</p>
-            </article>
-          </div>
-        </section>
+            <div class="rag-visualizer">
+              <h3>Real-Time Prompt Construction Visualization</h3>
+              <div class="rag-flow">
+                <div class="flow-box">
+                  <strong>User / Telemetry Event</strong>
+                  <span>"Concourse lift down, matchday egress scenario active."</span>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-box accent">
+                  <strong>Retrieved Knowledge (SOP #12)</strong>
+                  <span>"If Concourse Lift is down, assign 2 stewards to guide wheelchair users to Concourse West elevators."</span>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-box result">
+                  <strong>Grounded Output Brief</strong>
+                  <span>"Dispatch 2 stewards immediately to Concourse West. Display elevator rerouting signs at Section 104."</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
       </main>
     </div>
+
+    <!-- Hidden audio element for reading translation texts -->
+    <audio id="ttsAudio" style="display: none;"></audio>
     <script src="app.js"></script>
   </body>
 </html>
