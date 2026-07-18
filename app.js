@@ -1,5 +1,67 @@
 // VenueIQ 2026 - Main Application Script
 
+/**
+ * Sanitize and escape HTML special characters to prevent XSS attacks.
+ * @param {string} str - The string to escape.
+ * @returns {string} The escaped string.
+ */
+function escapeHTML(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/[&<>"']/g, function(m) {
+    switch (m) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      case "'": return '&#039;';
+      default: return m;
+    }
+  });
+}
+
+/**
+ * Checks user input for potential safety issues, profanity, or prompt injection attempts.
+ * @param {string} text - User query to inspect.
+ * @returns {{isSafe: boolean, message: string}} Object containing safety status and warning message.
+ */
+function checkInputSafety(text) {
+  if (!text || typeof text !== 'string') {
+    return { isSafe: true, message: "" };
+  }
+  const normalized = text.toLowerCase();
+  
+  // Prompt injection patterns
+  const injectionPatterns = [
+    "ignore previous instructions",
+    "ignore all instructions",
+    "forget previous",
+    "system prompt",
+    "you are now a",
+    "jailbreak",
+    "developer mode",
+    "ignore everything"
+  ];
+  
+  for (const pattern of injectionPatterns) {
+    if (normalized.includes(pattern)) {
+      return {
+        isSafe: false,
+        message: "Safety Alert: Input contains instruction override patterns. Operations policy prevents prompt injection."
+      };
+    }
+  }
+
+  // Basic SQL/XSS block indicators (if explicit scripts are passed)
+  if (normalized.includes("<script") || normalized.includes("javascript:") || normalized.includes("onload=")) {
+    return {
+      isSafe: false,
+      message: "Safety Alert: Executable script patterns detected. Input blocked."
+    };
+  }
+
+  return { isSafe: true, message: "" };
+}
+
 // Core Data Mocks & RAG Context Rules
 const venueProfiles = {
   ny: {
@@ -435,13 +497,20 @@ async function generateResponse(prompt, systemInstruction = '') {
   }
 
   // 3. Fallback to offline local rules engine
-  return { text: generateLocalFallback(prompt, systemInstruction), source: "Model Fallback Engine" };
+  const activeVenueKey = (typeof venueSelect !== 'undefined' && venueSelect) ? venueSelect.value : 'ny';
+  return { text: generateLocalFallback(prompt, activeVenueKey, systemInstruction), source: "Model Fallback Engine" };
 }
 
 // Local Generative Fallback Model
-function generateLocalFallback(prompt, systemInstruction) {
-  const activeVenueKey = (typeof venueSelect !== 'undefined' && venueSelect) ? venueSelect.value : 'ny';
-  const venue = venueProfiles[activeVenueKey];
+/**
+ * Generates offline fallback response using local RAG-like rules.
+ * @param {string} prompt - User query.
+ * @param {string} activeVenueKey - Current active venue ID ('ny', 'atl', etc.).
+ * @param {string} systemInstruction - Context and system constraints.
+ * @returns {string} Safe, grounded response.
+ */
+function generateLocalFallback(prompt, activeVenueKey = 'ny', systemInstruction) {
+  const venue = venueProfiles[activeVenueKey] || venueProfiles.ny;
   const query = prompt.toLowerCase();
   
   // Detect requested language (avoiding \b boundaries next to unicode characters)
@@ -627,15 +696,15 @@ function renderScenario() {
 
     briefList.innerHTML = override.brief.map(([title, body]) => `
       <article class="brief-item">
-        <strong>${title}</strong>
-        <p>${body}</p>
+        <strong>${escapeHTML(title)}</strong>
+        <p>${escapeHTML(body)}</p>
       </article>
     `).join("");
 
     dispatchList.innerHTML = override.dispatch.map(([title, body]) => `
       <li>
-        <strong>${title}</strong>
-        <p>${body}</p>
+        <strong>${escapeHTML(title)}</strong>
+        <p>${escapeHTML(body)}</p>
       </li>
     `).join("");
 
@@ -669,15 +738,15 @@ function renderScenario() {
 
     briefList.innerHTML = scenario.brief.map(([title, body]) => `
       <article class="brief-item">
-        <strong>${title}</strong>
-        <p>${body}</p>
+        <strong>${escapeHTML(title)}</strong>
+        <p>${escapeHTML(body)}</p>
       </article>
     `).join("");
 
     dispatchList.innerHTML = scenario.dispatch.map(([title, body]) => `
       <li>
-        <strong>${title}</strong>
-        <p>${body}</p>
+        <strong>${escapeHTML(title)}</strong>
+        <p>${escapeHTML(body)}</p>
       </li>
     `).join("");
 
@@ -752,16 +821,19 @@ function updateMapHighlight(targetZoneName, accentClass) {
 }
 
 // Render Audit Logs Table
+/**
+ * Renders the operations audit logs table, escaping variables to prevent XSS.
+ */
 function renderAuditLogs() {
   auditLogBody.innerHTML = auditLogs.map(log => `
     <tr>
-      <td>${log.time}</td>
-      <td><span class="audit-tag ${log.module === 'Operations' ? 'success' : 'info'}">${log.module}</span></td>
-      <td>${log.input}</td>
-      <td>${log.rec}</td>
-      <td>${log.confidence}</td>
-      <td>${log.approved}</td>
-      <td>${log.outcome}</td>
+      <td>${escapeHTML(log.time)}</td>
+      <td><span class="audit-tag ${log.module === 'Operations' ? 'success' : 'info'}">${escapeHTML(log.module)}</span></td>
+      <td>${escapeHTML(log.input)}</td>
+      <td>${escapeHTML(log.rec)}</td>
+      <td>${escapeHTML(log.confidence)}</td>
+      <td>${escapeHTML(log.approved)}</td>
+      <td>${escapeHTML(log.outcome)}</td>
     </tr>
   `).join("");
 }
@@ -820,7 +892,12 @@ function addChatMessage(role, text, model = '') {
     const speakBtn = document.createElement("button");
     speakBtn.className = "btn-speak";
     speakBtn.title = "Listen to answer";
-    speakBtn.innerHTML = "🔊";
+    speakBtn.setAttribute("aria-label", "Listen to answer");
+    
+    const speakIcon = document.createElement("span");
+    speakIcon.setAttribute("aria-hidden", "true");
+    speakIcon.textContent = "🔊";
+    speakBtn.appendChild(speakIcon);
     
     // Deduce language from text content
     let lang = 'en-US';
@@ -933,6 +1010,14 @@ if (typeof document !== 'undefined') {
     addChatMessage("fan", question);
     fanQuestion.value = "";
     
+    // Input Moderation and Safety Checks
+    const safety = checkInputSafety(question);
+    if (!safety.isSafe) {
+      addChatMessage("ai", safety.message, "Security Moderation");
+      addAuditLog("Security", `Blocked query: "${question}"`, safety.message, "Safety Moderation", "Auto-Blocked", "Input validation triggered");
+      return;
+    }
+    
     // RAG contextual system instruction construction
     const activeVenue = venueProfiles[venueSelect.value];
     const activeScenarioText = scenarioSelect.options[scenarioSelect.selectedIndex].text;
@@ -1015,6 +1100,8 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     venueProfiles,
     scenarios,
     incidentOverrides,
-    generateLocalFallback
+    generateLocalFallback,
+    escapeHTML,
+    checkInputSafety
   };
 }

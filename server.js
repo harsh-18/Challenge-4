@@ -52,6 +52,34 @@ const server = http.createServer(async (req, res) => {
         const payload = JSON.parse(body);
         const { prompt, systemInstruction } = payload;
 
+        if (!prompt || typeof prompt !== 'string' || prompt.trim() === '') {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Prompt is required and must be a valid string', code: 'INVALID_PROMPT' }));
+          return;
+        }
+
+        // Server-side safety validation (profanity, injections, scripts)
+        const normalizedPrompt = prompt.toLowerCase();
+        const injectionWords = [
+          "ignore previous instructions", 
+          "ignore all instructions", 
+          "forget previous", 
+          "system prompt", 
+          "you are now a", 
+          "jailbreak", 
+          "developer mode", 
+          "ignore everything"
+        ];
+        const isInjection = injectionWords.some(word => normalizedPrompt.includes(word));
+        const isScript = normalizedPrompt.includes("<script") || normalizedPrompt.includes("javascript:") || normalizedPrompt.includes("onload=");
+
+        if (isInjection || isScript) {
+          console.warn(`[Security Alert] Blocked potentially malicious payload: "${prompt}"`);
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Input blocked for security/safety compliance.', code: 'BLOCKED_PAYLOAD' }));
+          return;
+        }
+
         if (!GOOGLE_API_KEY) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: 'API key missing', code: 'API_KEY_MISSING' }));

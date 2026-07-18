@@ -10,7 +10,7 @@
   
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-muted: #8a9ab0;
   
   /* Status Accents (FIFA & Ops Themed) */
   --accent-blue: #00b0ff;
@@ -1366,4 +1366,41 @@ button {
     text-align: center;
     transform: rotate(90deg);
   }
+}
+
+/* Accessibility Focus System */
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--accent-blue);
+  outline-offset: 3px;
+}
+
+.svg-zone:focus-visible {
+  stroke: var(--accent-blue) !important;
+  stroke-width: 4px !important;
+  filter: drop-shadow(0 0 16px rgba(0, 176, 255, 0.75)) !important;
+  outline: none;
+}
+
+/* API Key Section Classes to replace inline styles */
+.api-key-input-container {
+  margin-top: 10px;
+}
+
+.api-key-label {
+  gap: 4px;
+}
+
+.api-key-title {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.api-key-input {
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  border-radius: 6px;
+  height: 32px;
 }

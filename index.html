@@ -72,10 +72,10 @@
             <span class="status-dot online"></span>
             <span id="apiStatusText">Live API Active</span>
           </div>
-          <div class="api-key-input-container" style="margin-top: 10px;">
-            <label class="field" for="apiConfigKey" style="gap: 4px;">
-              <span style="font-size: 0.7rem; color: var(--text-muted);">Gemini API Key</span>
-              <input id="apiConfigKey" type="password" placeholder="Paste AQ.Ab8... key" style="padding: 6px 10px; font-size: 0.78rem; border-radius: 6px; height: 32px;">
+          <div class="api-key-input-container">
+            <label class="field api-key-label" for="apiConfigKey">
+              <span class="api-key-title">Gemini API Key</span>
+              <input id="apiConfigKey" class="api-key-input" type="password" placeholder="Paste AQ.Ab8... key">
             </label>
           </div>
         </div>
@@ -238,7 +238,7 @@
               </div>
 
               <!-- Selected Zone Details -->
-              <div class="selected-detail-box">
+              <div class="selected-detail-box" aria-live="polite">
                 <p id="zoneDetail" class="selected-detail">Select a stadium zone on the map to inspect live AI operator guidance.</p>
               </div>
             </article>
@@ -269,7 +269,7 @@
               </div>
 
               <!-- Live AI Incident Briefs -->
-              <div id="briefList" class="brief-list"></div>
+              <div id="briefList" class="brief-list" aria-live="polite"></div>
 
               <!-- Human Approval Action -->
               <div class="approval-panel">
