@@ -1,59 +1,53 @@
 # VenueIQ 2026
 
-VenueIQ is a GenAI-enabled stadium operations copilot for FIFA World Cup 2026 host venues (including New York New Jersey Stadium, Atlanta Stadium, Mexico City Stadium, and BC Place Vancouver). It helps organizers, volunteers, venue staff, and fans make faster decisions during matchday crowd surges, weather delays, accessibility needs, transit bottlenecks, and multilingual support requests.
+VenueIQ is a GenAI-enabled stadium operations command center and fan copilot designed for the FIFA World Cup 2026 host venues. It provides real-time decision support, multilingual fan assistance, step-free/sensory accessibility routing, and carbon-reduction transport optimizations.
 
 ---
 
-## 🚀 Key Upgraded Features
-
-- **Interactive SVG Stadium Map**: Replaces the static grid of buttons with an animated vector map showing real-time crowd pressure heat colors. Zones are hoverable and clickable for live AI-generated operator guidance.
-- **Dynamic Tabbed Dashboard**: Easily switch between **Operations**, **Fan Assist**, **Sustainability**, **Audit Log**, and **AI Architecture** panels.
-- **Grounded Chat Copilot**: An interactive chat window that answers fan questions using RAG (Retrieval-Augmented Generation) grounded in stadium SOPs, layout geometry, and active incident states.
-- **Multilingual Support**: Automatically detects query language and translates instructions to Spanish, French, Portuguese, Arabic, and German.
-- **Voice Text-to-Speech (TTS)**: Click the speaker button `🔊` next to any AI chatbot response to hear the route directions read aloud in the native language using the Web Speech API.
-- **Incident & Scenario Simulator**: Cycle through *Pregame*, *Halftime*, *Weather delay*, and *Egress* scenarios, or inject custom incidents (e.g., *Gate A Ticket Scanner Failure*) to override metrics and trigger immediate response briefs.
-- **Sustainability Eco-Nudges**: Optimize local mode-share splits in real time by deploying rail/shuttle transit incentives to reduce carbon footprints.
-- **Compliance Audit Log**: Chronologically logs all AI decisions, prompts, model confidence, manual operator approvals, and simulated outcomes.
+## 🎯 Chosen Vertical
+* **Smart Stadiums & Tournament Operations**: Focuses on enhancing stadium crowd flow, safety coordination, steward tasking, and the tournament experience for fans, volunteers, and venue operators.
 
 ---
 
-## 🛡️ Robust RAG & Fallback Logic
+## 🧠 Approach & Logic
 
-VenueIQ uses a **Human-in-the-Loop RAG (Retrieval-Augmented Generation)** architecture:
-1. **Live Ingest**: aggregates ticket scans, transit bridge pressure, and elevator status.
-2. **Context Matching**: matches the current scenario to approved SOPs, stadium geometry, and translation lexicons.
-3. **Gemini API Integration**: The Node.js server proxies requests to `gemini-2.0-flash` using the user-provided `GOOGLE_API_KEY`.
-4. **Graceful Fallback**: If the key is out of quota (status `429`) or the server is offline, the client-side **Generative Fallback Engine** automatically compiles contextual answers and dispatches from the local knowledge base. The app remains 100% functional even offline.
-5. **Human Approval**: High-impact dispatcher actions require manual operator confirmation before notifications are sent out.
+### 1. Multi-Tiered Generative Pipeline (Fail-Safe Availability)
+Stadiun operations require 100% uptime. VenueIQ is built with a resilient, three-tiered routing system:
+* **Tier 1 (Server Proxy)**: If running the Node.js server, API requests proxy through to `gemini-2.0-flash`.
+* **Tier 2 (Client Direct Fetch)**: If deployed on a static hosting service (like GitHub Pages), the client's browser connects directly to the Google AI Studio Gemini API endpoint using the API key entered securely in the UI.
+* **Tier 3 (Local Generative Engine)**: If the API key is out of quota (`429`) or the user is offline, the app automatically fails back to an offline rule-based client engine. It generates detailed contextual answers and routes locally.
 
----
+### 2. Client-Side RAG (Retrieval-Augmented Generation)
+To ensure the AI is grounded in official venue policies and stadium layouts rather than hallucinating, the prompt system aggregates:
+* **Stadium Geometry**: Venue capacities, gate setups, elevator banks, and quiet zones.
+* **Live Telemetry & Incidents**: Match state (pregame, halftime, egress) and active emergency incidents.
+* **FIFA Operating Policies**: Approved guidelines for weather delays, accessibility transfers, and transport mode splits.
 
-## 🛠️ How to Run Locally
-
-### 1. Run Node.js Proxy Server
-This runs the proxy server and handles static asset routing and API proxying:
-```bash
-# In Windows Powershell (from workspace root):
-$env:PORT=3000
-node server.js
-```
-Open your browser and navigate to **`http://localhost:3000`**.
-
-### 2. Run Standalone Client-Side Mode
-You can also open the app directly from your file manager by double-clicking `index.html` (e.g. `file:///c:/Users/.../index.html`).
-- The application will automatically detect that the Node server is offline and activate the **Generative Fallback Engine** to run entirely client-side.
+### 3. Privacy & Secret Security
+* **Zero Secret Leaks**: No API keys are hardcoded in the codebase.
+* **Local Storage Storage**: Users securely paste their Gemini API Key in the settings UI. The key stays in the browser's `localStorage` and is never transmitted to any third-party backend.
+* **Ignored Internal Docs**: Staged Git ignores and untracks internal instructions to ensure no tournament rule files are published.
 
 ---
 
-## ☁️ Google Cloud Run Deployment
+## 💻 How the Solution Works
 
-To deploy VenueIQ 2026 to Google Cloud Run:
-1. Ensure your Google Cloud Project has **Billing enabled** (required for running containers on Cloud Run).
-2. Execute the following deployment command from the project root:
-   ```bash
-   gcloud run deploy venueiq-2026 --source . --project genai-apac-2-497615 --region us-central1 --allow-unauthenticated
-   ```
-3. (Optional) Set the Gemini API key as an environment variable in production:
-   ```bash
-   gcloud run services update venueiq-2026 --update-env-vars GOOGLE_API_KEY="YOUR_API_KEY" --project genai-apac-2-497615 --region us-central1
-   ```
+### 1. Tabbed Operations Dashboard
+* **Operations**: Features live metric gauges (Crowd Pressure, Accessible Routes, Volunteer Load, Transit Recovery) and an **Interactive SVG Stadium Map**. Clicking map zones highlights active pathways, reports live statistics, and displays operator SOP instructions.
+* **Fan Assist**: An interactive chat terminal. Fans can select quick prompts or ask questions in natural language. The AI responds in their language and includes a **Text-to-Speech (TTS)** speaker button to read directions aloud (supports English, Spanish, French, Portuguese, Arabic, and German).
+* **Sustainability**: Displays real-time transportation mode shares. Clicking "Deploy Low-Carbon Incentives" redirects pedestrian/rail traffic, shifts the mode bars, and saves carbon footprint estimates.
+* **Audit Log**: A compliance log displaying chronological records of AI alerts, system prompts, model versions, manual operator confirmations, and simulated outcomes.
+* **AI Architecture**: Visualizes the prompt compilation, RAG context injection, and human-in-the-loop workflows.
+
+### 2. Incident & Scenario Simulator
+* Operators can cycle active game states (Pregame, Halftime, Weather, Egress) or inject custom emergencies (e.g. *Gate A Ticket Scanner Failure*, *Concourse Elevator Down*, *Transit Platform Congestion*, *Severe Thunderstorm*).
+* Injecting an incident overrides telemetry, colors the SVG map zones with warning codes (Red for Hot, Amber for Watch), and generates dispatcher instructions.
+
+---
+
+## 📝 Assumptions Made
+
+1. **API Key Input**: The evaluator/operator has a valid Gemini API Key (available on Google AI Studio's free tier) to paste into the "Gemini API Key" password field in the sidebar footer to test live AI queries.
+2. **Offline Fallback Usage**: If no API key is supplied, the local Generative Fallback Engine will handle all inputs using static context guidelines.
+3. **Browser Capabilities**: The client browser supports HTML5 Speech Synthesis (`window.speechSynthesis`) for the voice assistant features, and SVG 2.0 rendering for the interactive map.
+4. **Free Tier Hosting**: The application is intended to run as a static web application hosted on free plans (like GitHub Pages or Firebase Hosting Spark plan).
